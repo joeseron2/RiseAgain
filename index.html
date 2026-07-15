@@ -405,14 +405,20 @@ const KEYWORD_ROUTES = [
 const chat = document.getElementById("chat");
 const textInput = document.getElementById("textInput");
 
-function scrollDown(){ chat.scrollTop = chat.scrollHeight; }
+// Scrolls so the new element's TOP is visible, instead of always jumping
+// to the very bottom of the chat (which was hiding the greeting/first
+// options on initial load).
+function scrollToStart(el){
+  el.scrollIntoView({ block: "start", behavior: "smooth" });
+}
 
-function addBotMessage(text){
+function addBotMessage(text, autoScroll = true){
   const row = document.createElement("div");
   row.className = "bubble-row bot";
   row.innerHTML = `<div class="bubble">${text}</div>`;
   chat.appendChild(row);
-  scrollDown();
+  if (autoScroll) scrollToStart(row);
+  return row;
 }
 
 function addUserMessage(text){
@@ -420,7 +426,8 @@ function addUserMessage(text){
   row.className = "bubble-row user";
   row.innerHTML = `<div class="bubble">${text}</div>`;
   chat.appendChild(row);
-  scrollDown();
+  scrollToStart(row);
+  return row;
 }
 
 function clearOptionRows(){
@@ -439,7 +446,7 @@ function addOptions(options, onPick){
     wrap.appendChild(btn);
   });
   chat.appendChild(wrap);
-  scrollDown();
+  return wrap;
 }
 
 function addFollowupOptions(){
@@ -482,7 +489,7 @@ function renderResourceCard(item){
       <div class="resource-actions">${actions}</div>
     </div>`;
   chat.appendChild(card);
-  scrollDown();
+  return card;
 }
 
 function showResource(key){
@@ -491,7 +498,7 @@ function showResource(key){
   addBotMessage(res.title);
   res.items.forEach(renderResourceCard);
   if (res.note){
-    addBotMessage(`<span style="font-size:13px;opacity:0.85;">${res.note}</span>`);
+    addBotMessage(`<span style="font-size:13px;opacity:0.85;">${res.note}</span>`, false);
   }
   addFollowupOptions();
 }
