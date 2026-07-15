@@ -181,6 +181,77 @@
     margin-top:4px;
     line-height:1.4;
   }
+  .quote-card{
+    background:var(--card);
+    color:var(--text-dark);
+    border-radius:var(--radius);
+    padding:18px 18px;
+    max-width:92%;
+    box-shadow:0 2px 10px rgba(0,0,0,0.18);
+    font-size:16px;
+    font-style:italic;
+    line-height:1.5;
+  }
+  .quote-card .quote-attr{
+    display:block;
+    margin-top:8px;
+    font-size:12.5px;
+    font-style:normal;
+    color:#666;
+  }
+  .checkin-card{
+    background:var(--card);
+    color:var(--text-dark);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    max-width:92%;
+    box-shadow:0 2px 10px rgba(0,0,0,0.18);
+  }
+  .checkin-card h3{ margin:0 0 12px; font-size:16px; }
+  .checkin-field{ margin-bottom:12px; }
+  .checkin-field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:#444;
+    margin-bottom:4px;
+  }
+  .checkin-field input[type="text"]{
+    width:100%;
+    padding:9px 11px;
+    border-radius:9px;
+    border:1px solid #ccc;
+    font-size:14px;
+    font-family:inherit;
+  }
+  .mood-row{ display:flex; gap:8px; margin-bottom:14px; }
+  .mood-btn{
+    flex:1;
+    padding:8px 6px;
+    border-radius:9px;
+    border:1px solid #ccc;
+    background:#f5f5f5;
+    color:#333;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .mood-btn.selected{
+    background:var(--accent);
+    border-color:var(--accent-dark);
+    color:#231206;
+    font-weight:700;
+  }
+  .checkin-save-btn{
+    background:var(--safe);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:10px 16px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    width:100%;
+  }
   #inputBar{
     display:flex;
     gap:8px;
@@ -369,7 +440,65 @@ const RESOURCES = {
       { name: "SMART Recovery", phone: null, phoneDisplay: null, url: "https://meetings.smartrecovery.org/meetings/", desc: "Secular, self-empowerment based, any addictive behavior." }
     ],
     note: "There's no wrong door — a lot of people try more than one before finding the fit that works."
+  },
+  meditation: {
+    title: "A short guided meditation",
+    items: [
+      { name: "UCLA Mindful — Free Guided Meditations", phone: null, phoneDisplay: null, url: "https://www.uclahealth.org/uclamindful/free-guided-meditations", desc: "Free, no sign-up. Short guided sessions (breathing, body scan, and more) from UCLA's Mindful Awareness Research Center, in English and Spanish." }
+    ]
   }
+};
+
+/* ---------------------------------------------------------
+   DAILY BOOST CONTENT
+   Quotes and jokes are plain text, shown right in the app — nothing
+   external, nothing tracked beyond "someone tapped this category."
+   Videos link out to a real, specific, verified video/channel (same
+   external-link pattern as every resource card) rather than embedding
+   a player, so no extra third-party tracking gets pulled into the app.
+--------------------------------------------------------- */
+const QUOTES = [
+  { text: "One day at a time.", attr: "Recovery saying" },
+  { text: "Progress, not perfection.", attr: "Recovery saying" },
+  { text: "This too shall pass.", attr: "Traditional saying" },
+  { text: "Keep coming back — it works if you work it.", attr: "Recovery saying" },
+  { text: "You are not your worst day.", attr: null },
+  { text: "Fall down seven times, stand up eight.", attr: "Japanese proverb" },
+  { text: "It always seems impossible until it's done.", attr: "Nelson Mandela" },
+  { text: "Rock bottom became the solid foundation on which I rebuilt my life.", attr: "J.K. Rowling" },
+  { text: "Recovery is not a race. You don't have to feel guilty if it takes you longer than you thought it would.", attr: null },
+  { text: "Nothing changes if nothing changes.", attr: "Recovery saying" },
+  { text: "Easy does it.", attr: "Recovery saying" },
+  { text: "Small steps every day add up to big change.", attr: null },
+  { text: "The comeback is always stronger than the setback.", attr: null },
+  { text: "You didn't come this far to only come this far.", attr: null }
+];
+
+const JOKES = [
+  "Why don't scientists trust atoms? Because they make up everything.",
+  "I told my therapist about my job. She said, \"That sounds exhausting.\" I said, \"Tell me about it.\"",
+  "Why did the coffee file a police report? It got mugged.",
+  "I'm reading a book about anti-gravity. It's impossible to put down.",
+  "What do you call a bear with no teeth? A gummy bear.",
+  "I used to be a banker, but I lost interest.",
+  "Why don't skeletons fight each other? They don't have the guts.",
+  "My dog used to chase people on a bike. It got so bad I had to take his bike away.",
+  "I told my wife she should embrace her mistakes. She gave me a hug.",
+  "What's the best thing about Switzerland? I don't know, but the flag is a big plus."
+];
+
+const VIDEO_PICKS = {
+  motivational: [
+    { name: "Everything you think you know about addiction is wrong", url: "https://www.ted.com/talks/johann_hari_everything_you_think_you_know_about_addiction_is_wrong", desc: "Johann Hari's widely watched TED Talk on connection, and what actually helps in recovery." },
+    { name: "The Art of the Pre-Game Speech", url: "https://www.youtube.com/watch?v=Beaa_J1_dCw", desc: "NFL Films — the kind of locker-room energy that fits a hard workout or a hard day." },
+    { name: "A Pep Talk from Kid President", url: "https://www.youtube.com/watch?v=l-gQLqv9f4o", desc: "Short, funny, and genuinely uplifting — a classic for a reason." },
+    { name: "Don't Quit — Motivational Speech", url: "https://www.youtube.com/watch?v=FnS6sFIs5Tg", desc: "A sports-style motivational speech compilation, if that's the energy you need right now." }
+  ],
+  funny: [
+    { name: "The Dodo — Best Animal Videos", url: "https://www.youtube.com/playlist?list=PLLoPYaJqlcK6eLLJkhaZJDrFMeQLuS9Gy", desc: "A whole playlist of The Dodo's best animal moments — pick any one." },
+    { name: "Funny Pets In Suitcases Compilation", url: "https://www.youtube.com/watch?v=P36WQA4PaSI", desc: "The Dodo Daily — exactly what it sounds like, and it's delightful." },
+    { name: "60 Minutes Of Animals Who Make Us LOL", url: "https://www.youtube.com/watch?v=d4pESyQ8k3k", desc: "Dodo Kids — a full hour if you've got the time to just laugh for a while." }
+  ]
 };
 
 /* ---------------------------------------------------------
@@ -389,7 +518,25 @@ const NODES = {
       { label: "Legal help (custody, eviction, rights)", locate: "legalAid" },
       { label: "Resume or job help", resource: "jobHelp" },
       { label: "Help with rent, bills, or food", resource: "financial" },
+      { label: "Need a boost today?", next: "boostMenu" },
       { label: "Something else / not sure", next: "unsure" }
+    ]
+  },
+  boostMenu: {
+    message: "What kind of boost sounds good right now?",
+    options: [
+      { label: "A quote for today", action: "quote" },
+      { label: "A motivational video", action: "video-motivational" },
+      { label: "Something to make you laugh", next: "laughMenu" },
+      { label: "A short guided meditation", resource: "meditation" },
+      { label: "Today's check-in", action: "checkin" }
+    ]
+  },
+  laughMenu: {
+    message: "Pick your poison:",
+    options: [
+      { label: "Tell me a joke", action: "joke" },
+      { label: "A funny animal video", action: "video-funny" }
     ]
   },
   meetingType: {
@@ -431,7 +578,11 @@ const KEYWORD_ROUTES = [
   { patterns: ["therapist","counselor","counseling","therapy"], type:"resource", target: "mentalHealthOngoing" },
   { patterns: ["rehab","detox","treatment center","treatment"], type:"resource", target: "treatmentIntro" },
   { patterns: ["meeting","aa","na","sober","sobriety","sponsor","twelve step","12 step"], type:"node", target: "meetingType" },
-  { patterns: ["crisis","panic","in crisis","need to talk now"], type:"resource", target: "crisisNow" }
+  { patterns: ["crisis","panic","in crisis","need to talk now"], type:"resource", target: "crisisNow" },
+  { patterns: ["joke","make me laugh","something funny"], type:"action", target: "joke" },
+  { patterns: ["quote of the day","need a quote","inspire me","need motivation"], type:"action", target: "quote" },
+  { patterns: ["meditate","meditation","breathing exercise"], type:"resource", target: "meditation" },
+  { patterns: ["need a boost","cheer me up","feeling good today","funny animal"], type:"node", target: "boostMenu" }
 ];
 
 /* ---------------------------------------------------------
@@ -616,11 +767,162 @@ function goToNode(nodeId){
       addUserMessage(opt.label);
       if (opt.locate) askForLocation(opt.locate);
       else if (opt.resource) showResource(opt.resource);
+      else if (opt.action) handleBoostAction(opt.action);
       else if (opt.next) goToNode(opt.next);
     });
   } else {
     clearOptionRows();
   }
+}
+
+/* ---------------------------------------------------------
+   DAILY BOOST — quotes, jokes, videos, and a private check-in.
+   None of this needs an account; the check-in is saved only in this
+   browser (localStorage), never sent anywhere.
+--------------------------------------------------------- */
+function pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+function handleBoostAction(action){
+  if (action === "quote") return showQuote();
+  if (action === "joke") return showJoke();
+  if (action === "video-motivational") return showVideoPick("motivational");
+  if (action === "video-funny") return showVideoPick("funny");
+  if (action === "checkin") return renderCheckIn();
+}
+
+function showQuote(){
+  trackEvent("boost-quote");
+  const q = pickRandom(QUOTES);
+  const row = document.createElement("div");
+  row.className = "bubble-row bot";
+  row.innerHTML = `<div class="quote-card">"${q.text}"${q.attr ? `<span class="quote-attr">— ${q.attr}</span>` : ""}</div>`;
+  chat.appendChild(row);
+  scrollToStart(row);
+  addOptions(
+    [
+      { label: "Another quote", action: "quote" },
+      { label: "Back to start", next: "start" }
+    ],
+    (opt) => {
+      addUserMessage(opt.label);
+      if (opt.action) handleBoostAction(opt.action);
+      else goToNode(opt.next);
+    }
+  );
+}
+
+function showJoke(){
+  trackEvent("boost-joke");
+  addBotMessage(pickRandom(JOKES));
+  addOptions(
+    [
+      { label: "Another one", action: "joke" },
+      { label: "Back to start", next: "start" }
+    ],
+    (opt) => {
+      addUserMessage(opt.label);
+      if (opt.action) handleBoostAction(opt.action);
+      else goToNode(opt.next);
+    }
+  );
+}
+
+function showVideoPick(category){
+  trackEvent("boost-video-" + category);
+  const pick = pickRandom(VIDEO_PICKS[category]);
+  addBotMessage(category === "motivational" ? "Here's one for you:" : "Here you go:");
+  renderResourceCard({ name: pick.name, url: pick.url, desc: pick.desc, phone: null });
+  addOptions(
+    [
+      { label: "Show me a different one", action: "video-" + category },
+      { label: "Back to start", next: "start" }
+    ],
+    (opt) => {
+      addUserMessage(opt.label);
+      if (opt.action) handleBoostAction(opt.action);
+      else goToNode(opt.next);
+    }
+  );
+}
+
+const CHECKIN_KEY = "riseagain-checkins";
+
+function loadCheckIns(){
+  try { return JSON.parse(localStorage.getItem(CHECKIN_KEY) || "{}"); }
+  catch (e) { return {}; }
+}
+
+function saveCheckIn(entry){
+  const all = loadCheckIns();
+  const today = new Date().toISOString().slice(0, 10);
+  all[today] = entry;
+  try { localStorage.setItem(CHECKIN_KEY, JSON.stringify(all)); } catch (e) { /* storage unavailable — still works, just won't persist */ }
+  return all;
+}
+
+function currentStreak(all){
+  let streak = 0;
+  let d = new Date();
+  while (true){
+    const key = d.toISOString().slice(0, 10);
+    if (!all[key]) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+function renderCheckIn(){
+  trackEvent("boost-checkin-open");
+  addBotMessage("Quick check-in — this stays right here on your device, nothing is sent anywhere.");
+  const card = document.createElement("div");
+  card.className = "bubble-row bot";
+  card.innerHTML = `
+    <div class="checkin-card">
+      <h3>How's today going?</h3>
+      <div class="mood-row">
+        <button type="button" class="mood-btn" data-mood="Good">Good</button>
+        <button type="button" class="mood-btn" data-mood="Okay">Okay</button>
+        <button type="button" class="mood-btn" data-mood="Struggling">Struggling</button>
+      </div>
+      <div class="checkin-field">
+        <label>One thing you're grateful for today</label>
+        <input type="text" class="checkin-gratitude" maxlength="120" />
+      </div>
+      <div class="checkin-field">
+        <label>One thing you want to focus on today</label>
+        <input type="text" class="checkin-focus" maxlength="120" />
+      </div>
+      <button type="button" class="checkin-save-btn">Save today's check-in</button>
+    </div>`;
+  chat.appendChild(card);
+  scrollToStart(card);
+
+  let selectedMood = null;
+  card.querySelectorAll(".mood-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      card.querySelectorAll(".mood-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedMood = btn.dataset.mood;
+    });
+  });
+
+  card.querySelector(".checkin-save-btn").addEventListener("click", () => {
+    const gratitude = card.querySelector(".checkin-gratitude").value.trim();
+    const focus = card.querySelector(".checkin-focus").value.trim();
+    const all = saveCheckIn({ mood: selectedMood, gratitude, focus });
+    const streak = currentStreak(all);
+    trackEvent("boost-checkin-save");
+    card.querySelectorAll("button, input").forEach(el => el.disabled = true);
+    const streakLine = streak > 1
+      ? `You've checked in ${streak} days in a row — nice consistency.`
+      : "Saved. Come back tomorrow and keep it going.";
+    addBotMessage(streakLine);
+    addOptions([{ label: "Back to start", next: "start" }], (opt) => {
+      addUserMessage(opt.label);
+      goToNode(opt.next);
+    });
+  });
 }
 
 function routeFreeText(text){
@@ -629,6 +931,7 @@ function routeFreeText(text){
     if (route.patterns.some(p => lower.includes(p))){
       if (route.type === "locate") askForLocation(route.target);
       else if (route.type === "resource") showResource(route.target);
+      else if (route.type === "action") handleBoostAction(route.target);
       else goToNode(route.target);
       return true;
     }
