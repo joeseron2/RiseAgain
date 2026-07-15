@@ -51,15 +51,23 @@
   }
   header h1{
     margin:0;
-    font-size:26px;
+    font-size:42px;
     letter-spacing:0.5px;
-    font-weight:700;
+    font-weight:800;
+    text-shadow:0 0 24px rgba(232,147,90,0.45);
   }
-  header p{
-    margin:4px 0 0;
-    font-size:13px;
+  header p.motto{
+    margin:6px 0 0;
+    font-size:14px;
     font-style:italic;
     color:#c9d0de;
+  }
+  header p.explainer{
+    margin:10px auto 0;
+    max-width:380px;
+    font-size:13.5px;
+    line-height:1.5;
+    color:#e4e8f0;
   }
   #safety-bar{
     margin:10px 16px 4px;
@@ -218,7 +226,8 @@
 <div id="app">
   <header>
     <h1>Rise Again</h1>
-    <p>Rise. Recover. Rebuild.</p>
+    <p class="motto">Rise. Recover. Rebuild.</p>
+    <p class="explainer">Your one-stop guide to every recovery resource — housing, meetings, counseling, legal help, work, and more. Tell me what you need, and I'll point you straight to it.</p>
   </header>
 
   <div id="safety-bar">
@@ -285,6 +294,18 @@ const RESOURCES = {
       { name: "Childhelp National Child Abuse Hotline", phone: "18004224453", phoneDisplay: "Call or text 1-800-422-4453", url: "https://childhelphotline.org", desc: "24/7, confidential, professional crisis counselors who can advise on reporting abuse/neglect and connect you to your local child protective services (DCFS/CPS) office." },
       { name: "211", phone: "211", phoneDisplay: "Dial 211", url: "https://www.211.org", desc: "Can connect you directly to your state or county's specific DCFS/CPS office and to family court self-help resources." }
     ],
+    note: "I don't have your exact state's office double-checked yet — this national line will get you to the right place. If a child is in immediate danger, call 911."
+  },
+  // State-specific entries are verified directly from that state's own official
+  // source before being added here — never guessed or bulk-scraped. Utah is
+  // first since that's where Rise Again's residences are. More states can be
+  // added the same way over time.
+  "childWelfare-UT": {
+    title: "Child safety & DCFS help — Utah",
+    items: [
+      { name: "Utah DCFS Child Abuse & Neglect Hotline", phone: "18553233237", phoneDisplay: "1-855-323-3237", url: "https://dcfs.utah.gov/services/child-protective-services/", desc: "Utah's official 24/7 hotline for reporting child abuse or neglect, run by the state Division of Child and Family Services." },
+      { name: "Childhelp National Child Abuse Hotline", phone: "18004224453", phoneDisplay: "Call or text 1-800-422-4453", url: "https://childhelphotline.org", desc: "National backup line if you'd rather talk it through with someone first — can also connect you to Utah DCFS." }
+    ],
     note: "If a child is in immediate danger, call 911."
   },
   legalAid: {
@@ -292,6 +313,14 @@ const RESOURCES = {
     items: [
       { name: "LawHelp.org", phone: null, phoneDisplay: null, url: "https://www.lawhelp.org", desc: "Find free and low-cost legal aid organizations in your state, searchable by your specific issue (custody, housing, benefits, etc.)." },
       { name: "Legal Services Corporation", phone: null, phoneDisplay: null, url: "https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help", desc: "Federally funded network of local legal aid programs for people who can't afford a lawyer." }
+    ],
+    note: "I don't have your exact state's legal aid office double-checked yet — these directories will point you to it directly."
+  },
+  "legalAid-UT": {
+    title: "Legal help — Utah",
+    items: [
+      { name: "Utah Legal Services", phone: "18013288891", phoneDisplay: "(801) 328-8891", url: "https://www.utahlegalservices.org/contact", desc: "Utah's main free/low-cost legal aid organization — custody, eviction, benefits, and more for people who qualify." },
+      { name: "LawHelp.org", phone: null, phoneDisplay: null, url: "https://www.lawhelp.org", desc: "Backup directory if Utah Legal Services can't take your specific case." }
     ]
   },
   jobHelp: {
@@ -356,8 +385,8 @@ const NODES = {
       { label: "Find a therapist / ongoing mental health support", resource: "mentalHealthOngoing" },
       { label: "Find housing or a shelter", next: "housingQ" },
       { label: "Domestic violence or abuse support", resource: "dv" },
-      { label: "Report a child safety concern / DCFS-CPS help", resource: "childWelfare" },
-      { label: "Legal help (custody, eviction, rights)", resource: "legalAid" },
+      { label: "Report a child safety concern / DCFS-CPS help", locate: "childWelfare" },
+      { label: "Legal help (custody, eviction, rights)", locate: "legalAid" },
       { label: "Resume or job help", resource: "jobHelp" },
       { label: "Help with rent, bills, or food", resource: "financial" },
       { label: "Something else / not sure", next: "unsure" }
@@ -394,8 +423,8 @@ const NODES = {
 const KEYWORD_ROUTES = [
   { patterns: ["suicide","kill myself","end my life","want to die","hurt myself","self harm","self-harm"], type:"resource", target: "crisisNow" },
   { patterns: ["hit me","hits me","afraid of my partner","he hurts me","she hurts me","abuse","abusive","domestic violence"], type:"resource", target: "dv" },
-  { patterns: ["child is in danger","report abuse","child abuse","cps","dcfs","child protective","custody"], type:"resource", target: "childWelfare" },
-  { patterns: ["lawyer","legal aid","eviction notice","court date","legal help"], type:"resource", target: "legalAid" },
+  { patterns: ["child is in danger","report abuse","child abuse","cps","dcfs","child protective","custody"], type:"locate", target: "childWelfare" },
+  { patterns: ["lawyer","legal aid","eviction notice","court date","legal help"], type:"locate", target: "legalAid" },
   { patterns: ["homeless","place to stay","shelter","no place to live","kicked out","eviction"], type:"resource", target: "housing" },
   { patterns: ["rent","utility","utilities","food bank","pay my bills","can't afford","financial help"], type:"resource", target: "financial" },
   { patterns: ["resume","job","interview","employment","career"], type:"resource", target: "jobHelp" },
@@ -523,13 +552,70 @@ function showResource(key){
   addFollowupOptions();
 }
 
+/* ---------------------------------------------------------
+   LOCATION-AWARE RESOURCES
+   A few categories (right now: DCFS/CPS and legal aid) have a real,
+   individually-verified state-specific resource. Everything else falls
+   back to the solid national resource. Nothing typed here is sent
+   anywhere — it's matched entirely in the browser and never touches
+   analytics or any server.
+--------------------------------------------------------- */
+// ZIP-code prefixes are only added here once verified — better to fall
+// back to the national resource than guess and get a state wrong.
+const ZIP_PREFIX_TO_STATE = [
+  { test: /^84\d{3}$/, state: "UT" } // Utah: 84001–84791
+];
+// Explicit 2-letter state/postal codes that map to a state we have
+// verified resources for (used when someone types "City, ST").
+const STATE_CODE_MAP = { UT: "UT", UTAH: "UT" };
+
+function resolveStateFromText(text){
+  const zipMatch = text.match(/\b(\d{5})\b/);
+  if (zipMatch){
+    const hit = ZIP_PREFIX_TO_STATE.find(r => r.test.test(zipMatch[1]));
+    if (hit) return hit.state;
+  }
+  const stateMatch = text.trim().match(/([A-Za-z]{2,10})\s*$/);
+  if (stateMatch){
+    const code = STATE_CODE_MAP[stateMatch[1].toUpperCase()];
+    if (code) return code;
+  }
+  return null;
+}
+
+let pendingTextHandler = null;
+
+function askForLocation(purpose){
+  const prompts = {
+    childWelfare: "What's your ZIP code (or city and state, like Provo, UT)? This isn't sent anywhere or logged — it just helps me find your state's specific office instead of a generic national line.",
+    legalAid: "What's your ZIP code (or city and state, like Provo, UT)? Same as always — this stays right here in your browser, nothing is sent or logged."
+  };
+  addBotMessage(prompts[purpose] || prompts.childWelfare);
+  addOptions(
+    [{ label: "I'd rather not say", action: "skip" }],
+    (opt) => {
+      addUserMessage(opt.label);
+      pendingTextHandler = null;
+      showResource(purpose);
+    }
+  );
+  pendingTextHandler = (text) => {
+    pendingTextHandler = null;
+    clearOptionRows();
+    const state = resolveStateFromText(text);
+    const key = state ? `${purpose}-${state}` : purpose;
+    showResource(RESOURCES[key] ? key : purpose);
+  };
+}
+
 function goToNode(nodeId){
   const node = NODES[nodeId];
   addBotMessage(node.message);
   if (node.options && node.options.length){
     addOptions(node.options, (opt) => {
       addUserMessage(opt.label);
-      if (opt.resource) showResource(opt.resource);
+      if (opt.locate) askForLocation(opt.locate);
+      else if (opt.resource) showResource(opt.resource);
       else if (opt.next) goToNode(opt.next);
     });
   } else {
@@ -541,7 +627,8 @@ function routeFreeText(text){
   const lower = text.toLowerCase();
   for (const route of KEYWORD_ROUTES){
     if (route.patterns.some(p => lower.includes(p))){
-      if (route.type === "resource") showResource(route.target);
+      if (route.type === "locate") askForLocation(route.target);
+      else if (route.type === "resource") showResource(route.target);
       else goToNode(route.target);
       return true;
     }
@@ -554,6 +641,13 @@ function handleUserText(){
   if (!val) return;
   addUserMessage(val);
   textInput.value = "";
+
+  if (pendingTextHandler){
+    const handler = pendingTextHandler;
+    handler(val);
+    return;
+  }
+
   const matched = routeFreeText(val);
   trackEvent(matched ? "freetext-matched" : "freetext-unmatched");
   if (!matched){
@@ -566,6 +660,7 @@ document.getElementById("sendBtn").onclick = handleUserText;
 textInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleUserText(); });
 
 document.getElementById("startOverBtn").onclick = () => {
+  pendingTextHandler = null;
   chat.innerHTML = "";
   goToNode("start");
 };
