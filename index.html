@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Rise Again</title>
+
+<!-- Privacy-first analytics (GoatCounter): no cookies, no personal data,
+     just aggregate counts of which category people land on. -->
+<script data-goatcounter="https://riseagain.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
 <style>
   :root{
     --bg-top:#1b2a4a;
@@ -492,9 +498,23 @@ function renderResourceCard(item){
   return card;
 }
 
+// Fires an anonymous, aggregate-only event (just a category name, e.g.
+// "resource-aa" or "freetext-used") — never the text someone typed, never
+// anything that could identify a visitor. No-ops silently if the
+// analytics script isn't loaded (e.g. GoatCounter not configured yet, or
+// blocked by the visitor's browser).
+function trackEvent(name){
+  try {
+    if (window.goatcounter && window.goatcounter.count){
+      window.goatcounter.count({ path: name, event: true });
+    }
+  } catch (e) { /* never let analytics break the app */ }
+}
+
 function showResource(key){
   const res = RESOURCES[key];
   if (!res){ addBotMessage("I don't have a specific resource for that yet — please try 211 (dial 211) for general help finding local services."); return; }
+  trackEvent("resource-" + key);
   addBotMessage(res.title);
   res.items.forEach(renderResourceCard);
   if (res.note){
@@ -535,6 +555,7 @@ function handleUserText(){
   addUserMessage(val);
   textInput.value = "";
   const matched = routeFreeText(val);
+  trackEvent(matched ? "freetext-matched" : "freetext-unmatched");
   if (!matched){
     addBotMessage("I'm not 100% sure which category that falls under, but here's a good place to start for almost anything:");
     showResource("financial");
