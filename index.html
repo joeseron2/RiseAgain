@@ -506,9 +506,10 @@ const VIDEO_PICKS = {
 --------------------------------------------------------- */
 const NODES = {
   start: {
-    message: "Hi, I'm glad you're here. What can I help you find today?",
+    message: "Hi, I'm really glad you're here — that already says something about you. What can I help you find today?",
     options: [
       { label: "Find a recovery meeting", next: "meetingType" },
+      { label: "Need a boost today?", next: "boostMenu" },
       { label: "Find treatment or counseling for substance use", resource: "treatmentIntro" },
       { label: "I need to talk to someone right now", resource: "crisisNow" },
       { label: "Find a therapist / ongoing mental health support", resource: "mentalHealthOngoing" },
@@ -518,7 +519,6 @@ const NODES = {
       { label: "Legal help (custody, eviction, rights)", locate: "legalAid" },
       { label: "Resume or job help", resource: "jobHelp" },
       { label: "Help with rent, bills, or food", resource: "financial" },
-      { label: "Need a boost today?", next: "boostMenu" },
       { label: "Something else / not sure", next: "unsure" }
     ]
   },
@@ -644,7 +644,7 @@ function addFollowupOptions(){
     (opt) => {
       addUserMessage(opt.label);
       if (opt.action === "thanks"){
-        addBotMessage("I'm really glad. Take things one step at a time — you're doing the hard part just by asking. I'm here if you need anything else.");
+        addBotMessage("I'm really glad. You're doing the hard part just by showing up and asking — that matters more than you probably give yourself credit for. One step at a time. You've got this, and I'm here whenever you need more.");
         clearOptionRows();
       } else {
         goToNode("start");
@@ -793,6 +793,7 @@ function handleBoostAction(action){
 function showQuote(){
   trackEvent("boost-quote");
   const q = pickRandom(QUOTES);
+  addBotMessage("Here's something to carry with you today:");
   const row = document.createElement("div");
   row.className = "bubble-row bot";
   row.innerHTML = `<div class="quote-card">"${q.text}"${q.attr ? `<span class="quote-attr">— ${q.attr}</span>` : ""}</div>`;
@@ -813,6 +814,7 @@ function showQuote(){
 
 function showJoke(){
   trackEvent("boost-joke");
+  addBotMessage("Alright, here's one for you:");
   addBotMessage(pickRandom(JOKES));
   addOptions(
     [
@@ -830,7 +832,7 @@ function showJoke(){
 function showVideoPick(category){
   trackEvent("boost-video-" + category);
   const pick = pickRandom(VIDEO_PICKS[category]);
-  addBotMessage(category === "motivational" ? "Here's one for you:" : "Here you go:");
+  addBotMessage(category === "motivational" ? "Here's something to fuel you up:" : "Here's a little joy for you:");
   renderResourceCard({ name: pick.name, url: pick.url, desc: pick.desc, phone: null });
   addOptions(
     [
@@ -915,8 +917,8 @@ function renderCheckIn(){
     trackEvent("boost-checkin-save");
     card.querySelectorAll("button, input").forEach(el => el.disabled = true);
     const streakLine = streak > 1
-      ? `You've checked in ${streak} days in a row — nice consistency.`
-      : "Saved. Come back tomorrow and keep it going.";
+      ? `That's ${streak} days in a row you've shown up for yourself — that's real momentum. Keep going, you've got this.`
+      : "Saved — proud of you for taking a minute for yourself today. Come back tomorrow and let's keep it going.";
     addBotMessage(streakLine);
     addOptions([{ label: "Back to start", next: "start" }], (opt) => {
       addUserMessage(opt.label);
