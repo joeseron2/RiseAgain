@@ -12,8 +12,11 @@
 
 <style>
   :root{
-    --bg-top:#1b2a4a;
+    --bg-top:#1b1240;
+    --bg-mid:#3a2358;
     --bg-bottom:#0f1a30;
+    --sunrise-1:#ff9a56;
+    --sunrise-2:#ffcf6b;
     --accent:#e8935a;
     --accent-dark:#c96f3a;
     --safe:#2f7d5c;
@@ -29,7 +32,7 @@
   body{
     margin:0;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
+    background:linear-gradient(180deg,var(--bg-bottom),var(--bg-bottom));
     color:var(--text-light);
     display:flex;
     justify-content:center;
@@ -43,31 +46,76 @@
     height:100dvh;
     display:flex;
     flex-direction:column;
-    background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
+    background:var(--bg-bottom);
+    position:relative;
+    overflow:hidden;
   }
   header{
-    padding:18px 20px 12px;
+    position:relative;
+    padding:26px 20px 40px;
     text-align:center;
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--sunrise-1) 88%, var(--sunrise-2) 130%);
+    background-size:100% 220%;
+    animation:sunrise-shift 14s ease-in-out infinite alternate;
+    overflow:hidden;
+  }
+  @keyframes sunrise-shift{
+    from{ background-position:0% 0%; }
+    to{ background-position:0% 30%; }
+  }
+  header::after{
+    /* mountain range silhouette along the bottom edge of the header */
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-2px;
+    height:46px;
+    background:
+      linear-gradient(var(--bg-bottom),var(--bg-bottom));
+    clip-path:polygon(
+      0% 100%, 0% 55%, 8% 40%, 16% 60%, 26% 25%, 36% 58%,
+      46% 15%, 58% 55%, 68% 30%, 78% 62%, 88% 20%, 96% 50%, 100% 35%, 100% 100%
+    );
+  }
+  header .sun-glow{
+    position:absolute;
+    left:50%; top:8px;
+    width:120px; height:120px;
+    transform:translateX(-50%);
+    background:radial-gradient(circle, rgba(255,207,107,0.85) 0%, rgba(255,154,86,0.35) 55%, rgba(255,154,86,0) 75%);
+    border-radius:50%;
+    animation:sun-pulse 5s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes sun-pulse{
+    0%,100%{ opacity:0.7; transform:translateX(-50%) scale(1); }
+    50%{ opacity:1; transform:translateX(-50%) scale(1.08); }
   }
   header h1{
+    position:relative;
     margin:0;
-    font-size:42px;
+    font-size:44px;
     letter-spacing:0.5px;
     font-weight:800;
-    text-shadow:0 0 24px rgba(232,147,90,0.45);
+    color:#fffaf3;
+    text-shadow:0 0 30px rgba(255,180,90,0.75), 0 2px 8px rgba(0,0,0,0.35);
   }
   header p.motto{
+    position:relative;
     margin:6px 0 0;
-    font-size:14px;
+    font-size:14.5px;
     font-style:italic;
-    color:#c9d0de;
+    font-weight:600;
+    color:#fff4e2;
+    text-shadow:0 1px 4px rgba(0,0,0,0.3);
   }
   header p.explainer{
+    position:relative;
     margin:10px auto 0;
     max-width:380px;
     font-size:13.5px;
     line-height:1.5;
-    color:#e4e8f0;
+    color:#fff8ef;
+    text-shadow:0 1px 3px rgba(0,0,0,0.25);
   }
   #safety-bar{
     margin:10px 16px 4px;
@@ -127,19 +175,44 @@
     margin-top:2px;
   }
   .option-btn{
-    background:rgba(255,255,255,0.08);
+    background:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
     border:1px solid rgba(255,255,255,0.25);
     color:var(--text-light);
-    padding:11px 14px;
-    border-radius:12px;
+    padding:12px 14px;
+    border-radius:14px;
     font-size:14.5px;
+    font-weight:600;
     text-align:left;
     cursor:pointer;
-    transition:background 0.15s ease;
+    transition:transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   }
   .option-btn:hover, .option-btn:active{
-    background:rgba(232,147,90,0.25);
-    border-color:var(--accent);
+    background:linear-gradient(135deg, rgba(255,169,90,0.35), rgba(255,207,107,0.18));
+    border-color:var(--sunrise-2);
+    transform:translateY(-1px);
+    box-shadow:0 4px 14px rgba(233,147,90,0.25);
+  }
+  /* The Daily Boost option gets its own sunrise-gradient treatment so it
+     stands out from the rest of the list at a glance — everything else
+     (including all safety/crisis-related options) stays in the calmer
+     default style above. */
+  .option-btn.option-btn-boost{
+    background:linear-gradient(135deg, var(--sunrise-1), var(--sunrise-2));
+    color:#3a2010;
+    border-color:transparent;
+    font-weight:800;
+    box-shadow:0 3px 12px rgba(255,159,86,0.35);
+  }
+  .option-btn.option-btn-boost:hover, .option-btn.option-btn-boost:active{
+    transform:translateY(-1px) scale(1.01);
+    box-shadow:0 6px 18px rgba(255,159,86,0.5);
+  }
+  @keyframes fade-in-up{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .bubble-row, .options{
+    animation:fade-in-up 0.35s ease both;
   }
   .resource-card{
     background:var(--card);
@@ -267,14 +340,15 @@
     outline:none;
   }
   #sendBtn{
-    background:var(--accent);
+    background:linear-gradient(135deg, var(--sunrise-1), var(--accent));
     color:#231206;
     border:none;
     border-radius:22px;
-    padding:0 18px;
-    font-weight:700;
+    padding:0 20px;
+    font-weight:800;
     font-size:14px;
     cursor:pointer;
+    box-shadow:0 3px 10px rgba(233,147,90,0.4);
   }
   #startOverWrap{
     text-align:center;
@@ -290,12 +364,79 @@
   }
   ::-webkit-scrollbar{width:6px;}
   ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:4px;}
+
+  /* Proactive "Summit" boost nudge — a friendly bubble that pops up on its
+     own (outside the normal option list) to invite people into the Daily
+     Boost. Purely optional/dismissible, never blocks the rest of the app. */
+  #boostNudge{
+    position:absolute;
+    left:16px; right:16px;
+    bottom:82px;
+    z-index:20;
+    display:flex;
+    pointer-events:none;
+    opacity:0;
+    transform:translateY(16px) scale(0.92);
+    transition:opacity 0.35s ease, transform 0.35s ease;
+  }
+  #boostNudge.show{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    pointer-events:auto;
+  }
+  .boost-nudge-bubble{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:linear-gradient(135deg, var(--sunrise-2), var(--sunrise-1));
+    color:#3a2010;
+    padding:11px 12px;
+    border-radius:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.3) inset;
+    max-width:100%;
+    animation:nudge-bob 2.6s ease-in-out infinite;
+  }
+  @keyframes nudge-bob{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-4px); }
+  }
+  .boost-nudge-avatar{
+    font-size:26px;
+    flex-shrink:0;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  }
+  .boost-nudge-text{
+    flex:1;
+    font-size:13.5px;
+    font-weight:700;
+    line-height:1.35;
+    text-align:left;
+    cursor:pointer;
+    background:none;
+    border:none;
+    color:inherit;
+    padding:0;
+    font-family:inherit;
+  }
+  .boost-nudge-close{
+    flex-shrink:0;
+    background:rgba(0,0,0,0.14);
+    border:none;
+    color:#3a2010;
+    width:22px; height:22px;
+    border-radius:50%;
+    font-size:13px;
+    line-height:1;
+    cursor:pointer;
+    font-family:inherit;
+  }
 </style>
 </head>
 <body>
 <noscript>This app needs JavaScript to run the guided conversation. Please open this file in a normal browser tab (Safari, Chrome, etc.) rather than an in-app preview.</noscript>
 <div id="app">
   <header>
+    <div class="sun-glow"></div>
     <h1>Rise Again</h1>
     <p class="motto">Rise. Recover. Rebuild.</p>
     <p class="explainer">Your one-stop guide to every recovery resource — housing, meetings, counseling, legal help, work, and more. Tell me what you need, and I'll point you straight to it.</p>
@@ -313,6 +454,14 @@
   <div id="inputBar">
     <input id="textInput" type="text" placeholder="Or just type what you need..." />
     <button id="sendBtn">Send</button>
+  </div>
+
+  <div id="boostNudge">
+    <div class="boost-nudge-bubble">
+      <span class="boost-nudge-avatar" aria-hidden="true">🌄</span>
+      <button type="button" id="boostNudgeText" class="boost-nudge-text">Hey, I'm Summit — got a sec for something good?</button>
+      <button type="button" id="boostNudgeClose" class="boost-nudge-close" aria-label="Dismiss">✕</button>
+    </div>
   </div>
 </div>
 
@@ -509,7 +658,7 @@ const NODES = {
     message: "Hi, I'm really glad you're here — that already says something about you. What can I help you find today?",
     options: [
       { label: "Find a recovery meeting", next: "meetingType" },
-      { label: "Need a boost today?", next: "boostMenu" },
+      { label: "Need a boost today?", next: "boostMenu", highlight: true },
       { label: "Find treatment or counseling for substance use", resource: "treatmentIntro" },
       { label: "I need to talk to someone right now", resource: "crisisNow" },
       { label: "Find a therapist / ongoing mental health support", resource: "mentalHealthOngoing" },
@@ -591,6 +740,48 @@ const KEYWORD_ROUTES = [
 const chat = document.getElementById("chat");
 const textInput = document.getElementById("textInput");
 
+/* ---------------------------------------------------------
+   "SUMMIT" BOOST NUDGE
+   A small friendly bubble that pops up on its own (outside the normal
+   option list) after a few quiet seconds on the start screen, inviting
+   people into the Daily Boost. Fully optional — a single tap opens the
+   Boost menu, the × dismisses it for the rest of this visit. Nothing
+   about this is tracked beyond the same anonymous, aggregate category
+   counts used everywhere else in the app.
+--------------------------------------------------------- */
+const boostNudge = document.getElementById("boostNudge");
+let nudgeTimer = null;
+let nudgeDismissed = false;
+
+function scheduleNudge(){
+  clearTimeout(nudgeTimer);
+  if (nudgeDismissed) return;
+  nudgeTimer = setTimeout(() => {
+    boostNudge.classList.add("show");
+    trackEvent("boost-nudge-shown");
+  }, 4000);
+}
+
+function hideNudge(){
+  clearTimeout(nudgeTimer);
+  boostNudge.classList.remove("show");
+}
+
+document.getElementById("boostNudgeText").onclick = () => {
+  trackEvent("boost-nudge-click");
+  hideNudge();
+  nudgeDismissed = true;
+  addUserMessage("Sure, I've got a sec.");
+  goToNode("boostMenu");
+};
+
+document.getElementById("boostNudgeClose").onclick = (e) => {
+  e.stopPropagation();
+  trackEvent("boost-nudge-dismiss");
+  nudgeDismissed = true;
+  hideNudge();
+};
+
 // Scrolls so the new element's TOP is visible, instead of always jumping
 // to the very bottom of the chat (which was hiding the greeting/first
 // options on initial load).
@@ -608,6 +799,7 @@ function addBotMessage(text, autoScroll = true){
 }
 
 function addUserMessage(text){
+  hideNudge();
   const row = document.createElement("div");
   row.className = "bubble-row user";
   row.innerHTML = `<div class="bubble">${text}</div>`;
@@ -626,7 +818,7 @@ function addOptions(options, onPick){
   wrap.className = "options";
   options.forEach(opt => {
     const btn = document.createElement("button");
-    btn.className = "option-btn";
+    btn.className = "option-btn" + (opt.highlight ? " option-btn-boost" : "");
     btn.textContent = opt.label;
     btn.onclick = () => onPick(opt);
     wrap.appendChild(btn);
@@ -966,12 +1158,16 @@ textInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleUser
 
 document.getElementById("startOverBtn").onclick = () => {
   pendingTextHandler = null;
+  nudgeDismissed = false;
+  hideNudge();
   chat.innerHTML = "";
   goToNode("start");
+  scheduleNudge();
 };
 
 // initial greeting
 goToNode("start");
+scheduleNudge();
 </script>
 </body>
 </html>
