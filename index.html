@@ -628,6 +628,41 @@ const RESOURCES = {
       { name: "LawHelp.org", phone: null, phoneDisplay: null, url: "https://www.lawhelp.org", desc: "Backup directory if Utah Legal Services can't take your specific case." }
     ]
   },
+  // Utah statewide fallback for treatment/mental health — used when we know
+  // someone is in Utah but couldn't match their ZIP to one of the specific
+  // county authorities below. Verified directly from sumh.utah.gov (the
+  // state's own Office of Substance Use and Mental Health).
+  "treatmentIntro-UT": {
+    title: "Finding treatment — Utah",
+    items: [
+      { name: "Utah Office of Substance Use and Mental Health", phone: "8015383939", phoneDisplay: "(801) 538-3939", url: "https://sumh.utah.gov", desc: "The state office overseeing Utah's public substance use treatment system — can direct you to your county's specific local authority." },
+      { name: "SAMHSA National Helpline", phone: "18006624357", phoneDisplay: "1-800-662-4357", url: "https://www.samhsa.gov/find-help/national-helpline", desc: "Free, confidential, 24/7/365 backup line if you'd rather talk it through with someone right now." }
+    ]
+  },
+  "mentalHealthOngoing-UT": {
+    title: "Finding a therapist — Utah",
+    items: [
+      { name: "Utah Office of Substance Use and Mental Health", phone: "8015383939", phoneDisplay: "(801) 538-3939", url: "https://sumh.utah.gov", desc: "The state office overseeing Utah's public mental health system — can direct you to your county's specific local authority." },
+      { name: "211", phone: "211", phoneDisplay: "Dial 211", url: "https://www.211.org", desc: "Connects you to free/low-cost counseling and mental health resources in your specific community." }
+    ]
+  },
+  lgbtqSupport: {
+    title: "LGBTQ+-affirming support",
+    items: [
+      { name: "The Trevor Project", phone: "18664887386", phoneDisplay: "1-866-488-7386", url: "https://www.thetrevorproject.org/get-help/", smsBody: "START", smsNumber: "678678", desc: "Free, confidential, 24/7 crisis support for LGBTQ+ young people. You can also text START to 678-678, or chat on their website." },
+      { name: "211", phone: "211", phoneDisplay: "Dial 211", url: "https://www.211.org", desc: "Can connect you to LGBTQ+-affirming counseling, support groups, and health services in your specific community." }
+    ],
+    note: "I don't have your exact state's LGBTQ+-specific resource center double-checked yet — these will still get you real, affirming support."
+  },
+  // Verified directly from encircletogether.org (July 2026) — a real Utah
+  // organization with physical resource centers, not just a hotline.
+  "lgbtqSupport-UT": {
+    title: "LGBTQ+-affirming support — Utah",
+    items: [
+      { name: "Encircle — LGBTQ+ Youth & Family Resource Center", phone: "8016137305", phoneDisplay: "(801) 613-7305", url: "https://encircletogether.org", desc: "Affirming therapy, support groups, and community space for LGBTQ+ people (ages 12+) and their families — free or low-cost. Physical resource centers in Salt Lake City, Provo, Ogden, Heber City, and St. George." },
+      { name: "The Trevor Project", phone: "18664887386", phoneDisplay: "1-866-488-7386", url: "https://www.thetrevorproject.org/get-help/", smsBody: "START", smsNumber: "678678", desc: "Free, confidential, 24/7 crisis support if you need to talk to someone right now, in addition to Encircle's ongoing support." }
+    ]
+  },
   jobHelp: {
     title: "Resume & job help",
     items: [
@@ -744,15 +779,16 @@ const NODES = {
     options: [
       { label: "Find a recovery meeting", next: "meetingType" },
       { label: "Need a boost today?", next: "boostMenu", highlight: true },
-      { label: "Find treatment or counseling for substance use", resource: "treatmentIntro" },
+      { label: "Find treatment or counseling for substance use", locate: "treatmentIntro" },
       { label: "I need to talk to someone right now", resource: "crisisNow" },
-      { label: "Find a therapist / ongoing mental health support", resource: "mentalHealthOngoing" },
+      { label: "Find a therapist / ongoing mental health support", locate: "mentalHealthOngoing" },
       { label: "Find housing or a shelter", next: "housingQ" },
       { label: "Domestic violence or abuse support", resource: "dv" },
       { label: "Report a child safety concern / DCFS-CPS help", locate: "childWelfare" },
       { label: "Legal help (custody, eviction, rights)", locate: "legalAid" },
       { label: "Resume or job help", resource: "jobHelp" },
       { label: "Help with rent, bills, or food", resource: "financial" },
+      { label: "LGBTQ+-affirming support", locate: "lgbtqSupport" },
       { label: "Something else / not sure", next: "unsure" }
     ]
   },
@@ -809,14 +845,15 @@ const KEYWORD_ROUTES = [
   { patterns: ["homeless","place to stay","shelter","no place to live","kicked out","eviction"], type:"resource", target: "housing" },
   { patterns: ["rent","utility","utilities","food bank","pay my bills","can't afford","financial help"], type:"resource", target: "financial" },
   { patterns: ["resume","job","interview","employment","career"], type:"resource", target: "jobHelp" },
-  { patterns: ["therapist","counselor","counseling","therapy"], type:"resource", target: "mentalHealthOngoing" },
-  { patterns: ["rehab","detox","treatment center","treatment"], type:"resource", target: "treatmentIntro" },
+  { patterns: ["therapist","counselor","counseling","therapy"], type:"locate", target: "mentalHealthOngoing" },
+  { patterns: ["rehab","detox","treatment center","treatment"], type:"locate", target: "treatmentIntro" },
   { patterns: ["meeting","aa","na","sober","sobriety","sponsor","twelve step","12 step"], type:"node", target: "meetingType" },
   { patterns: ["crisis","panic","in crisis","need to talk now"], type:"resource", target: "crisisNow" },
   { patterns: ["joke","make me laugh","something funny"], type:"action", target: "joke" },
   { patterns: ["quote of the day","need a quote","inspire me","need motivation"], type:"action", target: "quote" },
   { patterns: ["meditate","meditation","breathing exercise"], type:"resource", target: "meditation" },
-  { patterns: ["need a boost","cheer me up","feeling good today","funny animal"], type:"node", target: "boostMenu" }
+  { patterns: ["need a boost","cheer me up","feeling good today","funny animal"], type:"node", target: "boostMenu" },
+  { patterns: ["lgbtq","lgbt","gay","lesbian","transgender","nonbinary","non-binary","queer"], type:"locate", target: "lgbtqSupport" }
 ];
 
 /* ---------------------------------------------------------
@@ -972,16 +1009,24 @@ function trackEvent(name){
   } catch (e) { /* never let analytics break the app */ }
 }
 
-function showResource(key){
-  const res = RESOURCES[key];
-  if (!res){ addBotMessage("I don't have a specific resource for that yet — please try 211 (dial 211) for general help finding local services."); return; }
-  trackEvent("resource-" + key);
+// Shared rendering path for any resource set — whether it's a static
+// RESOURCES[key] entry, or one built on the fly (like a county-specific
+// treatment authority below). Keeps tracking/notes/follow-ups consistent
+// no matter where the resource object came from.
+function renderResourceSet(res, trackKey){
+  trackEvent("resource-" + (trackKey || "custom"));
   addBotMessage(res.title);
   res.items.forEach(renderResourceCard);
   if (res.note){
     addBotMessage(`<span style="font-size:13px;opacity:0.85;">${res.note}</span>`, false);
   }
   addFollowupOptions();
+}
+
+function showResource(key){
+  const res = RESOURCES[key];
+  if (!res){ addBotMessage("I don't have a specific resource for that yet — please try 211 (dial 211) for general help finding local services."); return; }
+  renderResourceSet(res, key);
 }
 
 /* ---------------------------------------------------------
@@ -1001,6 +1046,96 @@ const ZIP_PREFIX_TO_STATE = [
 // verified resources for (used when someone types "City, ST").
 const STATE_CODE_MAP = { UT: "UT", UTAH: "UT" };
 
+/* ---------------------------------------------------------
+   UTAH COUNTY-LEVEL TREATMENT & MENTAL HEALTH AUTHORITIES
+   Utah organizes its public substance use and mental health services
+   through county-based "Local Authorities" — real agencies, not a
+   directory link. Names/phones/addresses verified directly from
+   sumh.utah.gov (Utah's own Office of Substance Use and Mental Health)
+   in July 2026. ZIP-to-county ranges verified against Utah's own state
+   data portal (secure.utah.gov). Covers the state's main population
+   centers; a ZIP that doesn't match one of these still safely falls
+   back to the statewide Utah office rather than guessing a county.
+--------------------------------------------------------- */
+const UTAH_LOCAL_AUTHORITIES = {
+  "Salt Lake": {
+    substance: { name: "Salt Lake County Behavioral Health", phone: "3854684707", phoneDisplay: "(385) 468-4707", address: "2001 South State Street S2300, Salt Lake City, UT" },
+    mental:    { name: "Salt Lake County Behavioral Health", phone: "3854684707", phoneDisplay: "(385) 468-4707", address: "2001 South State Street S2300, Salt Lake City, UT" }
+  },
+  "Utah": {
+    substance: { name: "Wasatch Behavioral Health", phone: "8013734760", phoneDisplay: "(801) 373-4760", address: "750 North Freedom Blvd., Provo, UT" },
+    mental:    { name: "Wasatch Behavioral Health", phone: "8013734760", phoneDisplay: "(801) 373-4760", address: "750 North Freedom Blvd., Provo, UT" }
+  },
+  "Davis": {
+    substance: { name: "Davis Behavioral Health", phone: "8017737060", phoneDisplay: "(801) 773-7060", address: "934 S. Main St., Layton, UT 84041" },
+    mental:    { name: "Davis Behavioral Health", phone: "8017737060", phoneDisplay: "(801) 773-7060", address: "934 S. Main St., Layton, UT 84041" }
+  },
+  "Weber": {
+    substance: { name: "Weber Human Services", phone: "8016253700", phoneDisplay: "(801) 625-3700", address: "237 26th Street, Ogden, UT" },
+    mental:    { name: "Weber Human Services", phone: "8016253700", phoneDisplay: "(801) 625-3700", address: "237 26th Street, Ogden, UT" }
+  },
+  "Washington": {
+    substance: { name: "Southwest Behavioral Health", phone: "4353872671", phoneDisplay: "(435) 387-2671", address: "100 S. 100 W., Beaver, UT" },
+    mental:    { name: "Southwest Behavioral Health", phone: "4353872671", phoneDisplay: "(435) 387-2671", address: "100 S. 100 W., Beaver, UT" }
+  },
+  "Cache": {
+    substance: { name: "Bear River Substance Abuse Services", phone: "4357926500", phoneDisplay: "(435) 792-6500", address: "655 East 1300 North, Logan, UT 84321" },
+    mental:    { name: "Bear River Mental Health", phone: "4357520750", phoneDisplay: "(435) 752-0750", address: "90 East 200 North, Logan, UT" }
+  },
+  "Summit": {
+    substance: { name: "UNI Park City Clinic", phone: "4356585461", phoneDisplay: "(435) 658-5461", address: "Park City, UT" },
+    mental:    { name: "UNI Park City Clinic", phone: "4356585461", phoneDisplay: "(435) 658-5461", address: "Park City, UT" }
+  },
+  "Tooele": {
+    substance: { name: "Optum Tooele County", phone: "8006405349", phoneDisplay: "(800) 640-5349", address: "12921 South Vista Station Blvd., Draper, UT 84020" },
+    mental:    { name: "Optum Tooele County", phone: "8006405349", phoneDisplay: "(800) 640-5349", address: "12921 South Vista Station Blvd., Draper, UT 84020" }
+  },
+  "Wasatch": {
+    substance: { name: "Wasatch County Family Clinic", phone: "4356543003", phoneDisplay: "(435) 654-3003", address: "55 South 500 East, Heber City, UT 84032" },
+    mental:    { name: "Wasatch County Family Clinic", phone: "4356543003", phoneDisplay: "(435) 654-3003", address: "55 South 500 East, Heber City, UT 84032" }
+  }
+};
+
+// ZIP ranges per county, from Utah's own state data portal. If a ZIP
+// doesn't match any of these, we deliberately fall back to the statewide
+// office rather than guessing which county it's in.
+const UTAH_COUNTY_ZIPS = [
+  { county: "Salt Lake", test: z => [84006,84020,84044,84047,84065,84070,84084,84088,84165,84170,84171,84180,84184,84189,84190,84199].includes(z) || (z>=84090&&z<=84095) || (z>=84101&&z<=84158) },
+  { county: "Utah", test: z => [84003,84004,84013,84626,84633,84651,84653,84655,84660].includes(z) || (z>=84042&&z<=84043) || (z>=84057&&z<=84059) || z===84097 || (z>=84601&&z<=84606) || (z>=84663&&z<=84664) },
+  { county: "Davis", test: z => (z>=84010&&z<=84011) || (z>=84014&&z<=84016) || [84025,84037,84054,84075,84087,84089].includes(z) || (z>=84040&&z<=84041) },
+  { county: "Weber", test: z => [84201,84244,84310].includes(z) || (z>=84315&&z<=84317) || (z>=84401&&z<=84409) || z===84412 || (z>=84414&&z<=84415) },
+  { county: "Washington", test: z => (z>=84722&&z<=84726) || (z>=84729&&z<=84738) || (z>=84745&&z<=84746) || [84757,84763,84765,84767].includes(z) || (z>=84770&&z<=84771) || z===84774 || (z>=84779&&z<=84791) },
+  { county: "Cache", test: z => (z>=84304&&z<=84308) || (z>=84318&&z<=84328) || (z>=84332&&z<=84341) },
+  { county: "Summit", test: z => [84017,84024,84033,84036,84055,84068,84098].includes(z) || (z>=84060&&z<=84061) },
+  { county: "Tooele", test: z => [84022,84029,84034,84069,84071,84074,84080,84083].includes(z) },
+  { county: "Wasatch", test: z => [84032,84049,84082].includes(z) }
+];
+
+function resolveUtahCounty(text){
+  const zipMatch = text.match(/\b(\d{5})\b/);
+  if (!zipMatch) return null;
+  const z = parseInt(zipMatch[1], 10);
+  const hit = UTAH_COUNTY_ZIPS.find(c => c.test(z));
+  return hit ? hit.county : null;
+}
+
+// Builds a resource-card item for a given purpose ("treatmentIntro" or
+// "mentalHealthOngoing") and Utah county, pulling from the verified
+// UTAH_LOCAL_AUTHORITIES table above.
+function utahCountyResourceItem(purpose, county){
+  const entry = UTAH_LOCAL_AUTHORITIES[county];
+  if (!entry) return null;
+  const info = purpose === "treatmentIntro" ? entry.substance : entry.mental;
+  const kind = purpose === "treatmentIntro" ? "substance use treatment" : "mental health";
+  return {
+    name: `${info.name} — ${county} County`,
+    phone: info.phone,
+    phoneDisplay: info.phoneDisplay,
+    url: "https://sumh.utah.gov",
+    desc: `${county} County's official public ${kind} authority (verified via Utah's Office of Substance Use and Mental Health). Real people who can match you to a specific nearby provider and walk you through next steps — this isn't a website you have to figure out on your own.`
+  };
+}
+
 function resolveStateFromText(text){
   const zipMatch = text.match(/\b(\d{5})\b/);
   if (zipMatch){
@@ -1017,10 +1152,17 @@ function resolveStateFromText(text){
 
 let pendingTextHandler = null;
 
+// Purposes where, for Utah specifically, we can go one level more specific
+// than "state" and match an actual county-based local authority.
+const COUNTY_AWARE_PURPOSES = ["treatmentIntro", "mentalHealthOngoing"];
+
 function askForLocation(purpose){
   const prompts = {
     childWelfare: "What's your ZIP code (or city and state, like Provo, UT)? This isn't sent anywhere or logged — it just helps me find your state's specific office instead of a generic national line.",
-    legalAid: "What's your ZIP code (or city and state, like Provo, UT)? Same as always — this stays right here in your browser, nothing is sent or logged."
+    legalAid: "What's your ZIP code (or city and state, like Provo, UT)? Same as always — this stays right here in your browser, nothing is sent or logged.",
+    treatmentIntro: "What's your ZIP code? This isn't sent anywhere or logged — it just helps me find the specific treatment authority for your area instead of a generic national line.",
+    mentalHealthOngoing: "What's your ZIP code? Same as always — this stays right here in your browser, nothing is sent or logged. It just helps me find the specific office for your area.",
+    lgbtqSupport: "What's your ZIP code (or city and state)? This isn't sent anywhere or logged — it just helps me check whether there's an LGBTQ+-specific resource center in your area instead of just a national line."
   };
   addBotMessage(prompts[purpose] || prompts.childWelfare);
   addOptions(
@@ -1035,6 +1177,24 @@ function askForLocation(purpose){
     pendingTextHandler = null;
     clearOptionRows();
     const state = resolveStateFromText(text);
+
+    // For treatment/mental health in Utah, try to get all the way down to
+    // the county's real local authority before falling back to the
+    // statewide office, then the national resource.
+    if (state === "UT" && COUNTY_AWARE_PURPOSES.includes(purpose)){
+      const county = resolveUtahCounty(text);
+      const item = county ? utahCountyResourceItem(purpose, county) : null;
+      if (item){
+        const kind = purpose === "treatmentIntro" ? "Treatment" : "Mental health support";
+        renderResourceSet({
+          title: `${kind} — ${county} County, Utah`,
+          items: [item],
+          note: "If that number can't take your case, Utah's statewide office at (801) 538-3939 or dialing 211 can point you to the next-nearest option."
+        }, purpose + "-UT-county");
+        return;
+      }
+    }
+
     const key = state ? `${purpose}-${state}` : purpose;
     showResource(RESOURCES[key] ? key : purpose);
   };
