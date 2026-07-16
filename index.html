@@ -370,11 +370,11 @@
   ::-webkit-scrollbar{width:6px;}
   ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:4px;}
 
-  /* Proactive "Summit" boost nudge — a little animated character (not a
+  /* Proactive "Rise" boost nudge — a little illustrated character (not a
      stock icon/emoji) that pops up on its own, outside the normal option
      list, to invite people into the Daily Boost. Purely optional/
-     dismissible, never blocks the rest of the app. Built entirely out of
-     CSS shapes so there's no external image asset to host or break. */
+     dismissible, never blocks the rest of the app. Built entirely as
+     inline SVG so there's no external image asset to host or break. */
   #boostNudge{
     position:absolute;
     left:16px; right:16px;
@@ -393,94 +393,34 @@
     transform:translateY(0) scale(1);
     pointer-events:auto;
   }
-  #boostNudge.show .summit-guy{ animation:summit-bounce 2.2s ease-in-out infinite; }
+  #boostNudge.show .rise-buddy{ animation:rise-bounce 2.2s ease-in-out infinite; }
 
-  /* --- Summit, the little mascot --- */
-  .summit-guy{
+  /* --- Rise, the little mascot --- */
+  .rise-buddy{
     position:relative;
-    width:52px;
-    height:70px;
+    width:56px;
+    height:77px;
     flex-shrink:0;
     cursor:pointer;
   }
-  @keyframes summit-bounce{
+  .rise-buddy svg{
+    width:100%;
+    height:100%;
+    display:block;
+    overflow:visible;
+  }
+  @keyframes rise-bounce{
     0%,100%{ transform:translateY(0); }
     50%{ transform:translateY(-5px); }
   }
-  .summit-hair{
-    position:absolute;
-    top:-2px; left:50%;
-    width:26px; height:15px;
-    transform:translateX(-50%);
-    border-radius:14px 14px 0 0;
-    background:#4a3324;
+  .rise-arm-r{
+    transform-box:fill-box;
+    transform-origin:12% 100%;
+    animation:rise-wave 1.3s ease-in-out infinite;
   }
-  .summit-head{
-    position:absolute;
-    top:2px; left:50%;
-    width:27px; height:27px;
-    transform:translateX(-50%);
-    border-radius:50%;
-    background:#e7a672;
-    box-shadow:0 2px 4px rgba(0,0,0,0.25);
-  }
-  .summit-head::before{ /* eyes */
-    content:"";
-    position:absolute;
-    top:12px; left:6px;
-    width:4px; height:4px;
-    border-radius:50%;
-    background:#2a1a10;
-    box-shadow:11px 0 0 #2a1a10;
-  }
-  .summit-head::after{ /* smile */
-    content:"";
-    position:absolute;
-    top:16px; left:8.5px;
-    width:10px; height:5px;
-    border-bottom:2px solid #2a1a10;
-    border-radius:0 0 10px 10px;
-  }
-  .summit-body{
-    position:absolute;
-    top:26px; left:50%;
-    width:34px; height:32px;
-    transform:translateX(-50%);
-    border-radius:10px 10px 13px 13px;
-    background:#1c1c1c;
-    box-shadow:0 3px 6px rgba(0,0,0,0.3);
-    overflow:hidden;
-  }
-  .summit-shirt-text{
-    position:absolute;
-    top:5px; left:0; right:0;
-    text-align:center;
-    font-size:6px;
-    line-height:1.2;
-    font-weight:800;
-    letter-spacing:0.3px;
-    color:#ffcf6b;
-    font-family:inherit;
-  }
-  .summit-arm{
-    position:absolute;
-    top:28px;
-    width:7px; height:18px;
-    border-radius:5px;
-    background:#1c1c1c;
-  }
-  .summit-arm.left{
-    left:1px;
-    transform:rotate(-10deg);
-  }
-  .summit-arm.right{
-    right:1px;
-    transform-origin:top center;
-    animation:summit-wave 1.3s ease-in-out infinite;
-  }
-  @keyframes summit-wave{
-    0%,100%{ transform:rotate(18deg); }
-    50%{ transform:rotate(48deg); }
+  @keyframes rise-wave{
+    0%,100%{ transform:rotate(6deg); }
+    50%{ transform:rotate(34deg); }
   }
 
   .boost-nudge-bubble{
@@ -497,7 +437,7 @@
     max-width:100%;
   }
   .boost-nudge-bubble::before{
-    /* speech-bubble pointer, aimed back at Summit */
+    /* speech-bubble pointer, aimed back at Rise */
     content:"";
     position:absolute;
     left:-8px;
@@ -559,15 +499,52 @@
   </div>
 
   <div id="boostNudge">
-    <div class="summit-guy" id="summitGuy" aria-hidden="true">
-      <div class="summit-hair"></div>
-      <div class="summit-head"></div>
-      <div class="summit-arm left"></div>
-      <div class="summit-arm right"></div>
-      <div class="summit-body"><div class="summit-shirt-text">RISE<br>AGAIN</div></div>
+    <div class="rise-buddy" id="riseBuddy" aria-hidden="true">
+      <svg viewBox="0 0 64 88" xmlns="http://www.w3.org/2000/svg">
+        <!-- resting left arm -->
+        <path d="M20,60 C13,62 9,70 10,79 C10,82 13,83 15,81 C17,75 19,68 23,62 Z" fill="#161616"/>
+        <ellipse cx="10" cy="80" rx="4.6" ry="5.2" fill="#e8ac7c"/>
+        <!-- torso / shirt -->
+        <path d="M20,58 C20,50 25,45 32,45 C39,45 44,50 44,58 L45,86 L19,86 Z" fill="#1c1c1c"/>
+        <path d="M27,46 L32,52 L37,46" stroke="#050505" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="32" y="68" text-anchor="middle" font-size="7" font-weight="800" letter-spacing="0.4" fill="#ffcf6b" font-family="inherit">RISE</text>
+        <text x="32" y="76" text-anchor="middle" font-size="7" font-weight="800" letter-spacing="0.4" fill="#ffcf6b" font-family="inherit">AGAIN</text>
+        <!-- neck -->
+        <rect x="27" y="38" width="10" height="9" rx="3" fill="#e8ac7c"/>
+        <!-- waving right arm -->
+        <g class="rise-arm-r">
+          <path d="M44,58 C51,56 56,49 56,41 C56,38 53,37 51,39 C49,45 46,50 42,56 Z" fill="#1c1c1c"/>
+          <ellipse cx="56" cy="38" rx="4.8" ry="5.4" fill="#e8ac7c"/>
+        </g>
+        <!-- head -->
+        <ellipse cx="32" cy="24" rx="15.5" ry="17" fill="#e8ac7c"/>
+        <!-- ears -->
+        <ellipse cx="16.5" cy="25" rx="2.6" ry="4" fill="#e8ac7c"/>
+        <ellipse cx="47.5" cy="25" rx="2.6" ry="4" fill="#e8ac7c"/>
+        <!-- hair -->
+        <path d="M15,21 C14,7 22,2 32,2 C42,2 50,7 49,21 C49,13 42,10 32,10 C22,10 15,13 15,21 Z" fill="#3d2b1f"/>
+        <!-- blush -->
+        <ellipse cx="21.5" cy="30" rx="3" ry="1.8" fill="#ff9a76" opacity="0.35"/>
+        <ellipse cx="42.5" cy="30" rx="3" ry="1.8" fill="#ff9a76" opacity="0.35"/>
+        <!-- eyebrows -->
+        <rect x="21" y="18.3" width="7.5" height="2.1" rx="1.05" fill="#3d2b1f" transform="rotate(-6 24.75 19.35)"/>
+        <rect x="35.5" y="18.3" width="7.5" height="2.1" rx="1.05" fill="#3d2b1f" transform="rotate(6 39.25 19.35)"/>
+        <!-- eyes -->
+        <ellipse cx="25.5" cy="24.5" rx="3.2" ry="3.9" fill="#fff"/>
+        <ellipse cx="38.5" cy="24.5" rx="3.2" ry="3.9" fill="#fff"/>
+        <circle cx="25.9" cy="25.3" r="2" fill="#3d2b1f"/>
+        <circle cx="38.9" cy="25.3" r="2" fill="#3d2b1f"/>
+        <circle cx="26.6" cy="24.2" r="0.7" fill="#fff"/>
+        <circle cx="39.6" cy="24.2" r="0.7" fill="#fff"/>
+        <!-- nose -->
+        <path d="M31.3,26 Q32.5,29 30.5,30" stroke="#c98a5c" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.6"/>
+        <!-- mouth -->
+        <path d="M25,32.5 Q32,38.5 39,32.5 Q32,36 25,32.5 Z" fill="#a94b3a"/>
+        <path d="M27,33 Q32,35.8 37,33 Q32,34.4 27,33 Z" fill="#fff" opacity="0.85"/>
+      </svg>
     </div>
     <div class="boost-nudge-bubble">
-      <button type="button" id="boostNudgeText" class="boost-nudge-text">Hi, I'm Summit — need something good today?</button>
+      <button type="button" id="boostNudgeText" class="boost-nudge-text">Hi, I'm Rise — need something good today?</button>
       <button type="button" id="boostNudgeClose" class="boost-nudge-close" aria-label="Dismiss">✕</button>
     </div>
   </div>
@@ -849,11 +826,11 @@ const chat = document.getElementById("chat");
 const textInput = document.getElementById("textInput");
 
 /* ---------------------------------------------------------
-   "SUMMIT" BOOST NUDGE
+   "RISE" BOOST NUDGE
    A little animated character that pops up on its own (outside the
    normal option list) after a few quiet seconds on the start screen,
    inviting people into the Daily Boost. Fully optional — a single tap
-   (on Summit or the speech bubble) opens the Boost menu, the × dismisses
+   (on Rise or the speech bubble) opens the Boost menu, the × dismisses
    it for the rest of this visit. Nothing about this is tracked beyond
    the same anonymous, aggregate category counts used everywhere else in
    the app.
@@ -885,7 +862,7 @@ function openBoostFromNudge(){
 }
 
 document.getElementById("boostNudgeText").onclick = openBoostFromNudge;
-document.getElementById("summitGuy").onclick = openBoostFromNudge;
+document.getElementById("riseBuddy").onclick = openBoostFromNudge;
 
 document.getElementById("boostNudgeClose").onclick = (e) => {
   e.stopPropagation();
