@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Rise Again</title>
+<meta name="description" content="Your one-stop guide to every recovery resource — housing, meetings, counseling, legal help, work, and a daily boost.">
+
+<!-- Installable-app (PWA) setup: lets people add Rise Again to their home
+     screen with its own icon, open it full-screen, and use it offline. -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1d1e4a">
+<link rel="icon" href="./favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<!-- iOS home-screen behavior -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Rise Again">
 
 <!-- Privacy-first analytics (GoatCounter): no cookies, no personal data,
      just aggregate counts of which category people land on. -->
@@ -12,20 +25,54 @@
 
 <style>
   :root{
-    --bg-top:#1b1240;
-    --bg-mid:#3a2358;
-    --bg-bottom:#0f1a30;
-    --sunrise-1:#ff9a56;
-    --sunrise-2:#ffcf6b;
-    --accent:#e8935a;
-    --accent-dark:#c96f3a;
+    /* Brand palette — pulled straight from the real Rise Again logo */
+    --indigo-deep:#101024;
+    --indigo:#1d1e4a;
+    --indigo-2:#2b2d6b;
+    --peri:#5d63c1;        /* brand periwinkle */
+    --peri-lt:#a9ade8;
+    --silver:#c6cde0;
+    --coral:#ff7a5c;
+    --gold:#ffc24b;
     --safe:#2f7d5c;
     --danger:#c0392b;
     --card:#ffffff;
-    --bot-bubble:#f0ede6;
-    --text-dark:#1f1f1f;
-    --text-light:#f7f5f0;
+    --bot-bubble:#eef0f7;
+    --text-dark:#1f2333;
+    --text-light:#f4f5fb;
     --radius:16px;
+
+    /* Themeable tokens — overridden per "mood" below */
+    --app-bg:
+      radial-gradient(130% 80% at 50% -8%, rgba(93,99,193,0.55) 0%, rgba(29,30,74,0.30) 42%, rgba(16,16,36,0) 72%),
+      linear-gradient(180deg,#1a1b3d 0%, var(--indigo-deep) 62%, #0c0c1a 100%);
+    --accent:#ff7a5c;
+    --accent-ink:#3a1608;
+    --accent-grad:linear-gradient(135deg, var(--coral), var(--gold));
+    --halo:rgba(255,122,92,0.30);
+    --opt-hover:linear-gradient(135deg, rgba(255,169,90,0.30), rgba(255,207,107,0.16));
+    --opt-hover-border:var(--gold);
+    --play:running;   /* playful animations on by default */
+  }
+
+  /* ---- MOODS: the app changes rooms with you ---- */
+  #app[data-theme="pride"]{
+    --accent:#c94bd6;
+    --accent-ink:#2a0730;
+    --accent-grad:linear-gradient(90deg,#e63946,#f77f00,#fcbf49,#43aa8b,#4361ee,#7209b7);
+    --halo:rgba(201,75,214,0.30);
+    --opt-hover:linear-gradient(135deg, rgba(201,75,214,0.28), rgba(67,97,238,0.18));
+    --opt-hover-border:#c94bd6;
+  }
+  #app[data-theme="serious"]{
+    --app-bg:linear-gradient(180deg,#1a2030 0%, #12161f 70%, #0c0f16 100%);
+    --accent:#5a8aa0;
+    --accent-ink:#04121a;
+    --accent-grad:linear-gradient(135deg,#4f7f8c,#5a8aa0);
+    --halo:rgba(0,0,0,0);
+    --opt-hover:rgba(90,138,160,0.20);
+    --opt-hover-border:#5a8aa0;
+    --play:paused;   /* calm: quiet the bounce/pulse */
   }
   *{box-sizing:border-box;}
   html,body{
@@ -35,7 +82,7 @@
   body{
     margin:0;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:linear-gradient(180deg,var(--bg-bottom),var(--bg-bottom));
+    background:#0c0c1a;
     color:var(--text-light);
     display:flex;
     justify-content:center;
@@ -50,76 +97,68 @@
     height:100dvh;
     display:flex;
     flex-direction:column;
-    background:var(--bg-bottom);
+    background:var(--app-bg);
     position:relative;
     overflow:hidden;
+    transition:background 0.5s ease;
+  }
+  /* ambient glow that tints with the current mood */
+  #app::before{
+    content:"";
+    position:absolute; right:-50px; top:-30px;
+    width:230px; height:230px; border-radius:50%;
+    background:radial-gradient(circle, var(--halo), transparent 70%);
+    pointer-events:none; z-index:0;
+    transition:background 0.5s ease;
   }
   header{
-    position:relative;
-    padding:26px 20px 40px;
+    position:relative; z-index:1;
+    padding:22px 20px 14px;
     text-align:center;
-    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--sunrise-1) 88%, var(--sunrise-2) 130%);
-    background-size:100% 220%;
-    animation:sunrise-shift 14s ease-in-out infinite alternate;
-    overflow:hidden;
   }
-  @keyframes sunrise-shift{
-    from{ background-position:0% 0%; }
-    to{ background-position:0% 30%; }
+  .brand-lockup{
+    display:flex; align-items:center; justify-content:center; gap:12px;
   }
-  header::after{
-    /* mountain range silhouette along the bottom edge of the header */
-    content:"";
-    position:absolute;
-    left:0; right:0; bottom:-2px;
-    height:46px;
-    background:
-      linear-gradient(var(--bg-bottom),var(--bg-bottom));
-    clip-path:polygon(
-      0% 100%, 0% 55%, 8% 40%, 16% 60%, 26% 25%, 36% 58%,
-      46% 15%, 58% 55%, 68% 30%, 78% 62%, 88% 20%, 96% 50%, 100% 35%, 100% 100%
-    );
-  }
-  header .sun-glow{
-    position:absolute;
-    left:50%; top:8px;
-    width:120px; height:120px;
-    transform:translateX(-50%);
-    background:radial-gradient(circle, rgba(255,207,107,0.85) 0%, rgba(255,154,86,0.35) 55%, rgba(255,154,86,0) 75%);
-    border-radius:50%;
-    animation:sun-pulse 5s ease-in-out infinite;
-    pointer-events:none;
-  }
-  @keyframes sun-pulse{
-    0%,100%{ opacity:0.7; transform:translateX(-50%) scale(1); }
-    50%{ opacity:1; transform:translateX(-50%) scale(1.08); }
+  .brand-logo{
+    width:44px; height:auto;
+    filter:drop-shadow(0 2px 8px rgba(0,0,0,0.45));
   }
   header h1{
-    position:relative;
-    margin:0;
-    font-size:44px;
-    letter-spacing:0.5px;
-    font-weight:800;
-    color:#fffaf3;
-    text-shadow:0 0 30px rgba(255,180,90,0.75), 0 2px 8px rgba(0,0,0,0.35);
+    margin:0; font-size:38px; font-weight:900; letter-spacing:0.5px; line-height:1;
+    background:linear-gradient(100deg,#ffffff 0%, var(--peri-lt) 55%, var(--gold) 135%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    text-shadow:0 0 30px rgba(123,128,214,0.35);
+  }
+  #app[data-theme="serious"] header h1{
+    background:none; -webkit-text-fill-color:#e6ecf2; color:#e6ecf2; text-shadow:none;
   }
   header p.motto{
-    position:relative;
-    margin:6px 0 0;
-    font-size:14.5px;
-    font-style:italic;
-    font-weight:600;
-    color:#fff4e2;
-    text-shadow:0 1px 4px rgba(0,0,0,0.3);
+    margin:8px 0 0; font-size:14px; font-weight:700; color:#ffffff; letter-spacing:0.3px;
   }
   header p.explainer{
-    position:relative;
-    margin:10px auto 0;
-    max-width:380px;
-    font-size:13.5px;
-    line-height:1.5;
-    color:#fff8ef;
-    text-shadow:0 1px 3px rgba(0,0,0,0.25);
+    margin:8px auto 0; max-width:390px; font-size:13px; line-height:1.5; color:var(--peri-lt);
+  }
+  #app[data-theme="serious"] header p.explainer{ color:#9fb0c0; }
+  /* rainbow ribbon — only visible in the LGBTQ+ (pride) mood */
+  #pride-ribbon{
+    display:none; height:6px; margin:12px 16px 0; border-radius:6px;
+    background:linear-gradient(90deg,#e63946,#f77f00,#fcbf49,#43aa8b,#4361ee,#7209b7);
+  }
+  #app[data-theme="pride"] #pride-ribbon{ display:block; }
+  /* triage: "start with what's most urgent" quick chips */
+  #triage{ margin:14px 4px 2px; }
+  #triage .triage-label{ font-size:12px; color:var(--peri-lt); margin-bottom:8px; font-weight:600; }
+  #triage .triage-chips{ display:flex; flex-wrap:wrap; gap:7px; justify-content:center; }
+  .triage-chip{
+    background:rgba(169,173,232,0.12);
+    border:1px solid rgba(169,173,232,0.40);
+    color:var(--text-light);
+    font-size:12.5px; font-weight:600; font-family:inherit;
+    padding:8px 12px; border-radius:20px; cursor:pointer;
+    transition:background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .triage-chip:hover, .triage-chip:active{
+    background:rgba(93,99,193,0.35); border-color:var(--peri); transform:translateY(-1px);
   }
   #safety-bar{
     margin:10px 16px 4px;
@@ -192,18 +231,18 @@
     transition:transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   }
   .option-btn:hover, .option-btn:active{
-    background:linear-gradient(135deg, rgba(255,169,90,0.35), rgba(255,207,107,0.18));
-    border-color:var(--sunrise-2);
+    background:var(--opt-hover);
+    border-color:var(--opt-hover-border);
     transform:translateY(-1px);
-    box-shadow:0 4px 14px rgba(233,147,90,0.25);
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
   }
-  /* The Daily Boost option gets its own sunrise-gradient treatment so it
-     stands out from the rest of the list at a glance — everything else
+  /* The Daily Boost option gets the energetic accent-gradient treatment so
+     it stands out from the rest of the list at a glance — everything else
      (including all safety/crisis-related options) stays in the calmer
      default style above. */
   .option-btn.option-btn-boost{
-    background:linear-gradient(135deg, var(--sunrise-1), var(--sunrise-2));
-    color:#3a2010;
+    background:var(--accent-grad);
+    color:var(--accent-ink);
     border-color:transparent;
     font-weight:800;
     box-shadow:0 3px 12px rgba(255,159,86,0.35);
@@ -315,8 +354,8 @@
   }
   .mood-btn.selected{
     background:var(--accent);
-    border-color:var(--accent-dark);
-    color:#231206;
+    border-color:var(--accent);
+    color:var(--accent-ink);
     font-weight:700;
   }
   .checkin-save-btn{
@@ -345,15 +384,15 @@
     outline:none;
   }
   #sendBtn{
-    background:linear-gradient(135deg, var(--sunrise-1), var(--accent));
-    color:#231206;
+    background:var(--accent-grad);
+    color:var(--accent-ink);
     border:none;
     border-radius:22px;
     padding:0 20px;
     font-weight:800;
     font-size:14px;
     cursor:pointer;
-    box-shadow:0 3px 10px rgba(233,147,90,0.4);
+    box-shadow:0 3px 10px rgba(0,0,0,0.35);
   }
   #startOverWrap{
     text-align:center;
@@ -393,13 +432,13 @@
     transform:translateY(0) scale(1);
     pointer-events:auto;
   }
-  #boostNudge.show .rise-buddy{ animation:rise-bounce 2.2s ease-in-out infinite; }
+  #boostNudge.show .rise-buddy{ animation:rise-bounce 2.2s ease-in-out infinite; animation-play-state:var(--play); }
 
   /* --- Rise, the little mascot --- */
   .rise-buddy{
     position:relative;
-    width:56px;
-    height:77px;
+    width:60px;
+    height:82px;
     flex-shrink:0;
     cursor:pointer;
   }
@@ -415,12 +454,13 @@
   }
   .rise-arm-r{
     transform-box:fill-box;
-    transform-origin:12% 100%;
+    transform-origin:12% 92%;
     animation:rise-wave 1.3s ease-in-out infinite;
+    animation-play-state:var(--play);
   }
   @keyframes rise-wave{
-    0%,100%{ transform:rotate(6deg); }
-    50%{ transform:rotate(34deg); }
+    0%,100%{ transform:rotate(-5deg); }
+    50%{ transform:rotate(11deg); }
   }
 
   .boost-nudge-bubble{
@@ -428,8 +468,8 @@
     display:flex;
     align-items:center;
     gap:10px;
-    background:linear-gradient(135deg, var(--sunrise-2), var(--sunrise-1));
-    color:#3a2010;
+    background:linear-gradient(135deg, var(--gold), var(--coral));
+    color:#3a1608;
     padding:11px 12px;
     margin-bottom:14px;
     border-radius:18px;
@@ -445,7 +485,7 @@
     width:0; height:0;
     border-style:solid;
     border-width:7px 9px 7px 0;
-    border-color:transparent var(--sunrise-1) transparent transparent;
+    border-color:transparent var(--coral) transparent transparent;
   }
   .boost-nudge-text{
     flex:1;
@@ -478,10 +518,22 @@
 <noscript>This app needs JavaScript to run the guided conversation. Please open this file in a normal browser tab (Safari, Chrome, etc.) rather than an in-app preview.</noscript>
 <div id="app">
   <header>
-    <div class="sun-glow"></div>
-    <h1>Rise Again</h1>
-    <p class="motto">Rise. Recover. Rebuild.</p>
-    <p class="explainer">Your one-stop guide to every recovery resource — housing, meetings, counseling, legal help, work, and more. Tell me what you need, and I'll point you straight to it.</p>
+    <div class="brand-lockup">
+      <img class="brand-logo" src="./logo-mark-white.png" alt="Rise Again logo" />
+      <h1>RISE AGAIN</h1>
+    </div>
+    <p class="motto">We're in this together.</p>
+    <p class="explainer">Tell me what you need — I've already done the legwork, and we'll take the next step together.</p>
+    <div id="triage">
+      <div class="triage-label">New here? Start with what's most on your mind:</div>
+      <div class="triage-chips">
+        <button type="button" class="triage-chip" data-nav="housingQ">A place to stay</button>
+        <button type="button" class="triage-chip" data-nav="meetingType">Staying sober</button>
+        <button type="button" class="triage-chip" data-res="crisisNow">Talk to someone</button>
+        <button type="button" class="triage-chip" data-res="jobHelp">Find work</button>
+      </div>
+    </div>
+    <div id="pride-ribbon"></div>
   </header>
 
   <div id="safety-bar">
@@ -500,47 +552,74 @@
 
   <div id="boostNudge">
     <div class="rise-buddy" id="riseBuddy" aria-hidden="true">
-      <svg viewBox="0 0 64 88" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 64 92" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="skin" cx="42%" cy="36%" r="66%">
+            <stop offset="0%" stop-color="#f6c69d"/>
+            <stop offset="68%" stop-color="#e8ac7c"/>
+            <stop offset="100%" stop-color="#d5925b"/>
+          </radialGradient>
+          <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#dee3f0"/>
+          </linearGradient>
+          <linearGradient id="sleeve" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f2f4fb"/>
+            <stop offset="100%" stop-color="#d0d7e8"/>
+          </linearGradient>
+          <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4b3626"/>
+            <stop offset="100%" stop-color="#2e1f15"/>
+          </linearGradient>
+        </defs>
+        <!-- soft ground shadow -->
+        <ellipse cx="32" cy="89.5" rx="15" ry="2.8" fill="#000" opacity="0.18"/>
         <!-- resting left arm -->
-        <path d="M20,60 C13,62 9,70 10,79 C10,82 13,83 15,81 C17,75 19,68 23,62 Z" fill="#161616"/>
-        <ellipse cx="10" cy="80" rx="4.6" ry="5.2" fill="#e8ac7c"/>
-        <!-- torso / shirt -->
-        <path d="M20,58 C20,50 25,45 32,45 C39,45 44,50 44,58 L45,86 L19,86 Z" fill="#1c1c1c"/>
-        <path d="M27,46 L32,52 L37,46" stroke="#050505" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <text x="32" y="68" text-anchor="middle" font-size="7" font-weight="800" letter-spacing="0.4" fill="#ffcf6b" font-family="inherit">RISE</text>
-        <text x="32" y="76" text-anchor="middle" font-size="7" font-weight="800" letter-spacing="0.4" fill="#ffcf6b" font-family="inherit">AGAIN</text>
-        <!-- neck -->
-        <rect x="27" y="38" width="10" height="9" rx="3" fill="#e8ac7c"/>
-        <!-- waving right arm -->
+        <path d="M22,50 C17,54 14,60 14,66 C14,68.2 17.4,68.6 18.4,66.4 C19.2,61 21,56 25,52 Z" fill="url(#sleeve)"/>
+        <ellipse cx="15.6" cy="67" rx="4.4" ry="5" fill="url(#skin)"/>
+        <!-- torso / shirt (near-white so "PURPOSE DRIVEN" reads on any background) -->
+        <path d="M19,52 C19,46.5 24.5,44 32,44 C39.5,44 45,46.5 45,52 L47,90 L17,90 Z" fill="url(#shirt)"/>
+        <path d="M24,58 L26,89 L22.5,89 Z" fill="#000" opacity="0.05"/>
+        <path d="M40,58 L41.5,89 L38,89 Z" fill="#000" opacity="0.05"/>
+        <path d="M27,45 L32,51 L37,45" stroke="#c2c9dc" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="32" y="68" text-anchor="middle" font-size="5" font-weight="800" letter-spacing="0" fill="#3a4a9e" font-family="inherit">PURPOSE</text>
+        <text x="32" y="75.5" text-anchor="middle" font-size="5" font-weight="800" letter-spacing="0.2" fill="#3a4a9e" font-family="inherit">DRIVEN</text>
+        <!-- neck + shadow -->
+        <rect x="28" y="35" width="8" height="10" rx="3" fill="url(#skin)"/>
+        <ellipse cx="32" cy="44" rx="6" ry="2.3" fill="#000" opacity="0.10"/>
+        <!-- raised, waving right arm -->
         <g class="rise-arm-r">
-          <path d="M44,58 C51,56 56,49 56,41 C56,38 53,37 51,39 C49,45 46,50 42,56 Z" fill="#1c1c1c"/>
-          <ellipse cx="56" cy="38" rx="4.8" ry="5.4" fill="#e8ac7c"/>
+          <path d="M43,50 C46,44 50,38 52,33 C53,30.8 55.6,31.4 55,34 C54,40 50.5,47 46,52 Z" fill="url(#sleeve)"/>
+          <ellipse cx="53" cy="31.5" rx="4.6" ry="5.2" fill="url(#skin)"/>
         </g>
-        <!-- head -->
-        <ellipse cx="32" cy="24" rx="15.5" ry="17" fill="#e8ac7c"/>
         <!-- ears -->
-        <ellipse cx="16.5" cy="25" rx="2.6" ry="4" fill="#e8ac7c"/>
-        <ellipse cx="47.5" cy="25" rx="2.6" ry="4" fill="#e8ac7c"/>
+        <ellipse cx="17.2" cy="23" rx="2.6" ry="3.8" fill="url(#skin)"/>
+        <ellipse cx="46.8" cy="23" rx="2.6" ry="3.8" fill="url(#skin)"/>
+        <!-- head -->
+        <ellipse cx="32" cy="22" rx="15" ry="16.5" fill="url(#skin)"/>
+        <!-- jaw / cheek shading for dimension -->
+        <path d="M18,26 Q32,39 46,26 Q40,34 32,35 Q24,34 18,26 Z" fill="#c98a5c" opacity="0.16"/>
         <!-- hair -->
-        <path d="M15,21 C14,7 22,2 32,2 C42,2 50,7 49,21 C49,13 42,10 32,10 C22,10 15,13 15,21 Z" fill="#3d2b1f"/>
+        <path d="M15,21 C13,6 22,1.5 32,1.5 C42,1.5 51,6 49,21 C49,12.5 42,9.5 32,9.5 C22,9.5 15,12.5 15,21 Z" fill="url(#hair)"/>
+        <path d="M23,7 C27,4.5 37,4.5 41,7 C37,6 27,6 23,7 Z" fill="#5c4432" opacity="0.7"/>
         <!-- blush -->
-        <ellipse cx="21.5" cy="30" rx="3" ry="1.8" fill="#ff9a76" opacity="0.35"/>
-        <ellipse cx="42.5" cy="30" rx="3" ry="1.8" fill="#ff9a76" opacity="0.35"/>
+        <ellipse cx="22" cy="28.5" rx="3" ry="1.8" fill="#ff9a76" opacity="0.30"/>
+        <ellipse cx="42" cy="28.5" rx="3" ry="1.8" fill="#ff9a76" opacity="0.30"/>
         <!-- eyebrows -->
-        <rect x="21" y="18.3" width="7.5" height="2.1" rx="1.05" fill="#3d2b1f" transform="rotate(-6 24.75 19.35)"/>
-        <rect x="35.5" y="18.3" width="7.5" height="2.1" rx="1.05" fill="#3d2b1f" transform="rotate(6 39.25 19.35)"/>
+        <rect x="21.5" y="16.8" width="7.5" height="2.1" rx="1.05" fill="#3d2b1f" transform="rotate(-6 25.25 17.85)"/>
+        <rect x="35" y="16.8" width="7.5" height="2.1" rx="1.05" fill="#3d2b1f" transform="rotate(6 38.75 17.85)"/>
         <!-- eyes -->
-        <ellipse cx="25.5" cy="24.5" rx="3.2" ry="3.9" fill="#fff"/>
-        <ellipse cx="38.5" cy="24.5" rx="3.2" ry="3.9" fill="#fff"/>
-        <circle cx="25.9" cy="25.3" r="2" fill="#3d2b1f"/>
-        <circle cx="38.9" cy="25.3" r="2" fill="#3d2b1f"/>
-        <circle cx="26.6" cy="24.2" r="0.7" fill="#fff"/>
-        <circle cx="39.6" cy="24.2" r="0.7" fill="#fff"/>
+        <ellipse cx="26" cy="23" rx="3.2" ry="3.9" fill="#fff"/>
+        <ellipse cx="38" cy="23" rx="3.2" ry="3.9" fill="#fff"/>
+        <circle cx="26.4" cy="23.8" r="2" fill="#3d2b1f"/>
+        <circle cx="38.4" cy="23.8" r="2" fill="#3d2b1f"/>
+        <circle cx="27.1" cy="22.7" r="0.7" fill="#fff"/>
+        <circle cx="39.1" cy="22.7" r="0.7" fill="#fff"/>
         <!-- nose -->
-        <path d="M31.3,26 Q32.5,29 30.5,30" stroke="#c98a5c" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.6"/>
-        <!-- mouth -->
-        <path d="M25,32.5 Q32,38.5 39,32.5 Q32,36 25,32.5 Z" fill="#a94b3a"/>
-        <path d="M27,33 Q32,35.8 37,33 Q32,34.4 27,33 Z" fill="#fff" opacity="0.85"/>
+        <path d="M31.3,24.5 Q32.6,27.5 30.6,28.5" stroke="#c98a5c" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.6"/>
+        <!-- smile -->
+        <path d="M25.5,31 Q32,37 38.5,31 Q32,34.6 25.5,31 Z" fill="#a94b3a"/>
+        <path d="M27.5,31.6 Q32,34.4 36.5,31.6 Q32,33 27.5,31.6 Z" fill="#fff" opacity="0.85"/>
       </svg>
     </div>
     <div class="boost-nudge-bubble">
@@ -861,6 +940,30 @@ const KEYWORD_ROUTES = [
 --------------------------------------------------------- */
 const chat = document.getElementById("chat");
 const textInput = document.getElementById("textInput");
+const appEl = document.getElementById("app");
+
+/* ---------------------------------------------------------
+   ADAPTIVE MOODS
+   The app changes its whole feeling depending on where the person is:
+     • "home"    — vibrant/energetic (default, everyday resources)
+     • "pride"   — warm rainbow accents for LGBTQ+ support
+     • "serious" — calm, quiet, grounded for crisis/DV/DCFS
+   setTheme() just flips a data-theme attribute; all the color/animation
+   changes are handled by CSS variables, so it's instant and reliable.
+--------------------------------------------------------- */
+// Resource keys (and their state variants) that should feel calm & serious.
+const SERIOUS_KEYS = ["crisisNow", "dv", "childWelfare"];
+const PRIDE_KEYS = ["lgbtqSupport"];
+function baseKey(key){ return String(key || "").split("-")[0]; }
+function themeForResource(key){
+  const b = baseKey(key);
+  if (SERIOUS_KEYS.includes(b)) return "serious";
+  if (PRIDE_KEYS.includes(b)) return "pride";
+  return "home";
+}
+function setTheme(name){
+  appEl.setAttribute("data-theme", name || "home");
+}
 
 /* ---------------------------------------------------------
    "RISE" BOOST NUDGE
@@ -907,6 +1010,20 @@ document.getElementById("boostNudgeClose").onclick = (e) => {
   nudgeDismissed = true;
   hideNudge();
 };
+
+/* Triage chips in the header — the fastest possible first step for someone
+   who's overwhelmed and doesn't know where to begin. Each chip jumps
+   straight to the right place. */
+document.querySelectorAll(".triage-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    hideNudge();
+    nudgeDismissed = true;
+    addUserMessage(chip.textContent);
+    trackEvent("triage-" + (chip.dataset.nav || chip.dataset.res || "?"));
+    if (chip.dataset.nav) goToNode(chip.dataset.nav);
+    else if (chip.dataset.res) showResource(chip.dataset.res);
+  });
+});
 
 // Scrolls so the new element's TOP is visible, instead of always jumping
 // to the very bottom of the chat (which was hiding the greeting/first
@@ -1014,6 +1131,7 @@ function trackEvent(name){
 // treatment authority below). Keeps tracking/notes/follow-ups consistent
 // no matter where the resource object came from.
 function renderResourceSet(res, trackKey){
+  setTheme(themeForResource(trackKey));
   trackEvent("resource-" + (trackKey || "custom"));
   addBotMessage(res.title);
   res.items.forEach(renderResourceCard);
@@ -1157,6 +1275,9 @@ let pendingTextHandler = null;
 const COUNTY_AWARE_PURPOSES = ["treatmentIntro", "mentalHealthOngoing"];
 
 function askForLocation(purpose){
+  // Shift the mood as soon as they enter the zone (e.g. calm for DCFS,
+  // pride for LGBTQ+) — before we even ask for the ZIP.
+  setTheme(themeForResource(purpose));
   const prompts = {
     childWelfare: "What's your ZIP code (or city and state, like Provo, UT)? This isn't sent anywhere or logged — it just helps me find your state's specific office instead of a generic national line.",
     legalAid: "What's your ZIP code (or city and state, like Provo, UT)? Same as always — this stays right here in your browser, nothing is sent or logged.",
@@ -1201,6 +1322,9 @@ function askForLocation(purpose){
 }
 
 function goToNode(nodeId){
+  // Question nodes are neutral/home mood; a resource shown afterward will
+  // set its own mood (serious/pride) via renderResourceSet.
+  setTheme("home");
   const node = NODES[nodeId];
   addBotMessage(node.message);
   if (node.options && node.options.length){
@@ -1417,6 +1541,21 @@ document.getElementById("startOverBtn").onclick = () => {
 // initial greeting
 goToNode("start");
 scheduleNudge();
+
+/* ---------------------------------------------------------
+   INSTALLABLE-APP (PWA) SERVICE WORKER
+   Registers the service worker so Rise Again can be added to a home
+   screen and used offline. Only runs on a real https:// host (like
+   GitHub Pages) — it safely does nothing when the file is opened
+   directly, so local previews never error.
+--------------------------------------------------------- */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {
+      /* registration is a progressive enhancement — never block the app */
+    });
+  });
+}
 </script>
 </body>
 </html>

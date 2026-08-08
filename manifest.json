@@ -1,0 +1,35 @@
+{
+  "name": "Rise Again — Recovery Resources",
+  "short_name": "Rise Again",
+  "description": "Your one-stop guide to every recovery resource — housing, meetings, counseling, legal help, work, and a daily boost. Tell it what you need, and it points you straight to real, specific help.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#131329",
+  "theme_color": "#1d1e4a",
+  "categories": ["health", "medical", "lifestyle"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
